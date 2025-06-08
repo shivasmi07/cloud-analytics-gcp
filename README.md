@@ -57,10 +57,15 @@ Analyze customer and order data to uncover patterns in regional distribution and
 
 ## 📁 Repository Structure
 cloud-analytics-pipeline-gcp/
+
 ├── app/                   # FastAPI backend
+
 ├── sql/                   # SQL queries
+
 ├── dashboards/            # Dashboard links and screenshots
+
 ├── README.md              # You’re here
+
 └── requirements.txt       # FastAPI dependencies
 
 ## 👩‍💻 Author
