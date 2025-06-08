@@ -1,0 +1,8 @@
+Looker Studio Dashboard – Customer and Order Analysis.
+
+https://lookerstudio.google.com/embed/reporting/808fd43b-ee88-471f-aa5f-277b83b992bd/page/p_j3uxvxc3rd
+
+This dashboard shows:
+- Regional customer breakdown (top countries & states)
+- Quarterly order trends (2019–2023)
+- Interactive filters by country and year

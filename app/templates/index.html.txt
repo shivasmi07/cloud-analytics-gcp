@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>📊 Customer and Orders Analytics</title>
+    <!-- DataTables CSS and Buttons Extension -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 46px;
+            margin-bottom: 0;
+        }
+        h1 img {
+            height: 60px;
+            margin-right: 20px;
+        }
+        p {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 4px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 30px;
+        }
+        .toggle-btn {
+            padding: 14px 24px;
+            margin: 10px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .hidden {
+            display: none;
+        }
+        .dt-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        .dataTables_wrapper .bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .dataTables_wrapper .bottom .dt-buttons {
+            order: 2;
+            justify-content: flex-end;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .dataTables_wrapper .bottom .dataTables_info {
+            order: 0;
+            text-align: center;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .dataTables_wrapper .bottom .dataTables_paginate {
+            order: 1;
+            width: 100%;
+            text-align: right;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1><img src="https://cdn-icons-png.flaticon.com/512/2910/2910791.png" alt="Logo"> Customer and Orders Analytics</h1>
+    <p><strong>Regional and Quarterly Distribution from 2019–2023 Orders Analytics</strong></p>
+
+    <div style="text-align: center;">
+        <button class="toggle-btn" onclick="showTable('regional')" title="Click to view regional breakdown table">Show Regional Table</button>
+        <button class="toggle-btn" onclick="showTable('orders')" title="Click to view quarterly orders table">Show Orders Table</button>
+    </div>
+
+    <div id="regional" class="table-section hidden">
+        <h2>Regional Breakdown of Customers</h2>
+        <table id="regionalTable" class="display">
+            <thead>
+                <tr><th title="Customer country">Country</th><th title="Total number of customers">Customers</th><th title="State with highest customer count">Top State</th><th title="Customers in the top state">State Count</th><th title="Percentage of total customers">% Share</th></tr>
+            </thead>
+            <tbody>
+                {% for item in regional %}
+                <tr>
+                    <td>{{ item.country }}</td>
+                    <td>{{ item.customer_count }}</td>
+                    <td>{{ item.top_state }}</td>
+                    <td>{{ item.state_customer_count }}</td>
+                    <td>{{ item.customer_percentage }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="orders" class="table-section hidden">
+        <h2>Quarterly Orders Trend</h2>
+        <table id="ordersTable" class="display">
+            <thead>
+                <tr><th title="Year and quarter">Quarter</th><th title="Number of orders placed">Total Orders</th></tr>
+            </thead>
+            <tbody>
+                {% for item in quarterly %}
+                <tr>
+                    <td>{{ item.order_quarter }}</td>
+                    <td>{{ item.total_orders }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#regionalTable').DataTable({
+                dom: '<"top"f>rt<"bottom dt-layout"<"dataTables_info"i><"dataTables_paginate"p><"dt-buttons"B>>',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+            });
+            $('#ordersTable').DataTable({
+                dom: '<"top"f>rt<"bottom dt-layout"<"dataTables_info"i><"dataTables_paginate"p><"dt-buttons"B>>',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+            });
+        });
+
+        function showTable(tableId) {
+            document.querySelectorAll('.table-section').forEach(div => {
+                div.classList.add('hidden');
+            });
+            document.getElementById(tableId).classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

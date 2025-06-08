@@ -1,0 +1,72 @@
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from google.cloud import bigquery
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
+app = FastAPI()
+client = bigquery.Client()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    # Query 1: Regional Breakdown
+    query1 = """
+        WITH customer_counts AS (
+            SELECT
+                country,
+                COUNT(DISTINCT id) AS customer_count
+            FROM
+                `thelook.users`
+            WHERE country IS NOT NULL AND TRIM(country) != ''
+            GROUP BY country
+        ),
+        total AS (
+            SELECT SUM(customer_count) AS total_customers FROM customer_counts
+        ),
+        ranked_states AS (
+            SELECT
+                country,
+                state,
+                COUNT(id) AS state_customer_count,
+                RANK() OVER (PARTITION BY country ORDER BY COUNT(id) DESC) AS state_rank
+            FROM
+                `thelook.users`
+            WHERE country IS NOT NULL AND state IS NOT NULL
+            GROUP BY country, state
+        )
+        SELECT
+            cc.country,
+            cc.customer_count,
+            ROUND((cc.customer_count / t.total_customers) * 100, 2) AS customer_percentage,
+            rs.state AS top_state,
+            rs.state_customer_count
+        FROM customer_counts cc
+        JOIN total t ON 1=1
+        LEFT JOIN ranked_states rs ON cc.country = rs.country AND rs.state_rank = 1
+        ORDER BY customer_count DESC
+    """
+
+    regional_data = [dict(row) for row in client.query(query1).result()]
+
+    # Query 2: Quarterly Orders
+    query2 = """
+        SELECT
+            CONCAT(EXTRACT(YEAR FROM created_at), '-Q', CAST(EXTRACT(QUARTER FROM created_at) AS STRING)) AS order_quarter,
+            COUNT(order_id) AS total_orders
+        FROM
+            `thelook.orders`
+        WHERE created_at IS NOT NULL
+        GROUP BY order_quarter
+        ORDER BY order_quarter
+    """
+
+    quarterly_data = [dict(row) for row in client.query(query2).result()]
+
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "regional": regional_data,
+        "quarterly": quarterly_data
+    })
