@@ -56,7 +56,6 @@ Analyze customer and order data to uncover patterns in regional distribution and
 * Conceptual comparison between GCP and AWS implementations
 
 ## 📁 Repository Structure
-
 cloud-analytics-pipeline-gcp/
 ├── app/                   # FastAPI backend
 ├── sql/                   # SQL queries
